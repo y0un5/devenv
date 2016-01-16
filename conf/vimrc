@@ -1,0 +1,320 @@
+" vundle {{{
+"- https://github.com/gmarik/vundle
+set nocompatible               " be iMproved
+filetype off                   " required!
+
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+
+" let Vundle manage Vundle
+" required!
+Plugin 'gmarik/Vundle.vim'
+
+" My bundles
+" plugin
+Plugin 'Lokaltog/powerline'
+Plugin 'scrooloose/nerdtree'
+Plugin 'Lokaltog/vim-easymotion'
+Plugin 'Shougo/neocomplcache.vim'
+"Plugin 'majutsushi/tagbar'
+"Plugin 'cespare/vjde'
+Plugin 'vim-scripts/javaDoc.vim'
+"Plugin 'Valloric/YouCompleteMe'
+Plugin 'bronson/vim-trailing-whitespace'
+"Plugin 'nathanaelkane/vim-indent-guides'
+"Plugin 'luxflux/vim-git-inline-diff'
+
+" color scheme
+Plugin 'jonathanfilip/vim-lucius'
+Plugin 'ciaranm/inkpot'
+Plugin 'jellybeans.vim'
+Plugin 'chriskempson/vim-tomorrow-theme'
+Plugin 'Lokaltog/vim-distinguished'
+Plugin 'noahfrederick/vim-hemisu'
+Plugin 'junegunn/seoul256.vim'
+Plugin 'romainl/apprentice'
+
+" syntax
+Plugin 'derekwyatt/vim-scala'
+Plugin 'sprsquish/thrift.vim'
+Plugin 'VimClojure'
+Plugin 'chase/vim-ansible-yaml'
+Plugin 'asciidoc/vim-asciidoc'
+"Plugin 'fatih/vim-go'
+
+" vimside
+"Plugin 'megaannum/self'
+"Plugin 'megaannum/forms'
+"Plugin 'Shougo/vimproc'
+"Plugin 'Shougo/vimshell'
+"Plugin 'aemoncannon/ensime'
+"Plugin 'megaannum/vimside'
+
+" All of your Plugins must be added before the following line
+call vundle#end()            " required
+filetype plugin indent on    " required
+" To ignore plugin indent changes, instead use:
+"filetype plugin on
+"
+" Brief help
+" :PluginList          - list configured plugins
+" :PluginInstall(!)    - install (update) plugins
+" :PluginSearch(!) foo - search (or refresh cache first) for foo
+" :PluginClean(!)      - confirm (or auto-approve) removal of unused plugins
+"
+" see :h vundle for more details or wiki for FAQ
+" Put your non-Plugin stuff after this line
+" }}}
+" basic vim configurations {{{
+set nu
+set nowrap
+"set bg=dark
+set ai
+set si
+set shiftwidth=4
+set ts=4
+set sts=4
+set hlsearch
+syntax on
+set nocp
+filetype plugin on
+"set fo+=r
+set ruler
+set fdm=marker "set foldmethod
+"set cursorline
+"}}}
+" encoding {{{
+set fileencodings=utf-8,cp949
+set enc=UTF-8
+set tenc=UTF-8
+set fenc=UTF-8
+map ,e : set enc=utf8 tenc=cp949<cr>
+" }}}
+" file type {{{
+au BufRead,BufNewFile *.proto setfiletype proto
+au BufRead,BufNewFile *.js set ft=javascript syntax=jquery ts=2 sts=2 sw=2 expandtab
+au BufRead,BufNewFile *.py set ft=python ts=2 sts=2 sw=2 expandtab
+au BufRead,BufNewFile *.rb set ft=ruby ts=2 sts=2 sw=2 expandtab
+au BufRead,BufNewFile *.scala set ft=scala ts=2 sts=2 sw=2 expandtab
+au BufRead,BufNewFile *.sbt set ft=scala ts=2 sts=2 sw=2 expandtab
+au BufRead,BufNewFile *.xml set ft=xml ts=2 sts=2 sw=2 expandtab
+au BufRead,BufNewFile *.html set ft=html ts=2 sts=2 sw=2 expandtab
+au BufRead,BufNewFile *.thrift set ft=thrift ts=2 sts=2 sw=2 expandtab
+au BufRead,BufNewFile *.java set ft=java ts=2 sts=2 sw=2 expandtab
+au BufRead,BufNewFile *.adoc set ft=asciidoc ts=2 sts=2 sw=2 expandtab
+" }}}
+" mapping {{{
+"nmap <F5> : !gcc % -o %< -g <CR>
+nmap <F5> : !mvn package <CR>
+nmap <F6> : !g++ % -o %< <CR>
+nmap <F7> : !./%< <CR>
+
+map ,n : nohl<cr>
+map ,t : tabe
+map ,q : tabp<cr>
+map ,w : tabn<cr>
+
+" moving between file buffers
+map ,1 :b!1<cr>
+map ,2 :b!2<cr>
+map ,3 :b!3<cr>
+map ,4 :b!4<cr>
+map ,5 :b!5<cr>
+map ,6 :b!6<cr>
+map ,7 :b!7<cr>
+map ,8 :b!8<cr>
+map ,9 :b!9<cr>
+map ,0 :b!0<cr>
+" }}}
+" man page {{{
+func! Man()
+	let sm = expand("<cword>")
+	exe "!man -S 2:3:4:5:6:7:8:9:tcl:n:l:p:o ".sm
+endfunc
+nmap ,ma :call Man()<cr><cr>
+" }}}
+" ctags {{{
+set tags=./.tags,.tags,./tags,tags,TAGS
+
+if version >= 500
+	func! Sts()
+		let st = expand("<cword>")
+		exe "sts " .st
+	endfunc
+	nmap ,st :call Sts()<cr>
+
+	func! VSts()
+		let st = expand("<cword>")
+		exe "vert sts " .st
+	endfunc
+	nmap ,vst :call VSts()<cr>
+
+	func! Tj()
+		let st = expand("<cword>")
+		exe "tj " .st
+	endfunc
+	nmap ,tj :call Tj()<cr>
+endif
+"}}}
+" cscope {{{
+set csprg=/usr/bin/cscope
+set csto=1 " search tags first, then search cscope
+set cst
+set nocsverb
+
+if filereadable("./cscope.out")
+	cs add cscope.out
+endif
+
+"set csverb
+
+func! Css()
+	let css = expand("<cword>")
+	new
+	exe "cs find s ".css
+	if getline(1) == ""
+		exe "q!"
+	endif
+endfunc
+nmap ,css :call Css()<cr>
+
+func! Csc()
+	let csc = expand("<cword>")
+	new
+	exe "cs find c ".csc
+	if getline(1) == ""
+		exe "q!"
+	endif
+endfunc
+nmap ,csc :call Csc()<cr>
+
+func! Csd()
+	let csd = expand("<cword>")
+	new
+	exe "cs find d ".csd
+	if getline(1) == ""
+		exe "q!"
+	endif
+endfunc
+nmap ,csd :call Csd()<cr>
+
+func! Csg()
+	let csg = expand("<cword>")
+	new
+	exe "cs find g ".csg
+	if getline(1) == ""
+		exe "q!"
+	endif
+endfunc
+nmap ,csg :call Csg()<cr>
+
+" vertical split
+func! VCss()
+	let css = expand("<cword>")
+	"new
+	exe "vert scs find s ".css
+	if getline(1) == ""
+		exe "q!"
+	endif
+endfunc
+nmap ,vcss :call VCss()<cr>
+
+func! VCsc()
+	let csc = expand("<cword>")
+	"new
+	exe "vert scs find c ".csc
+	if getline(1) == ""
+		exe "q!"
+	endif
+endfunc
+nmap ,vcsc :call VCsc()<cr>
+
+func! VCsd()
+	let csd = expand("<cword>")
+	"new
+	exe "vert scs find d ".csd
+	if getline(1) == ""
+		exe "q!"
+	endif
+endfunc
+nmap ,vcsd :call VCsd()<cr>
+
+func! VCsg()
+	let csg = expand("<cword>")
+	"new
+	exe "vert scs find g ".csg
+	if getline(1) == ""
+		exe "q!"
+	endif
+endfunc
+nmap ,vcsg :call VCsg()<cr>
+"}}}
+
+let mapleader = ","
+
+" plugin configurations
+" powerline
+set rtp+=~/.vim/bundle/powerline/powerline/bindings/vim
+set laststatus=2
+let g:Powerline_symbols = 'fancy'
+
+" nerdtree
+map ,g :NERDTreeToggle<CR>
+let NERDTreeWinSize = 40
+
+"tagbar
+"map ,b :TagbarToggle<CR>
+
+" vim-scala
+let g:scala_sort_across_groups=1
+let g:scala_first_party_namespaces='com.my'
+
+" neocomplcache
+let g:neocomplcache_enable_at_startup = 1
+"let g:neocomplcache_enable_at_startup = 0
+
+" vjde(ctrl-X + ctrl-U)
+"let g:vjde_lib_path = '/home/ubuntu/env/hbase/lib/hbase-client-0.96.1.1-hadoop2.jar'
+"let g:vjde_lib_path .= '/home/ubuntu/env/zookeeper/zookeeper-3.4.3.jar'
+"let g:vjde_lib_path .= ':build/classes'
+
+" javaDoc
+"  1) To use the mapping <Leader>jh, the cursor has to be placed on the class name
+"  2) Use the :Javadoc command and supply the Class name as an argument.
+" (use absolute path for javadoc_ID_File!)
+let g:no_of_ID_Files = 4
+let g:javadoc_ID_File_1 = '/home/ubuntu/Project/Document/jdk-7u51/docs/api/allclasses-frame.html'
+let g:javadoc_ID_File_2 = '/home/ubuntu/Project/Document/hbase-0.96.1.1-hadoop2/apidocs/allclasses-frame.html'
+let g:javadoc_ID_File_3 = '/home/ubuntu/Project/Document/hadoop-2.2.0/api/allclasses-frame.html'
+let g:javadoc_ID_File_4 = '/home/ubuntu/Project/Document/zookeeper-3.4.3/api/allclasses-frame.html'
+let g:srchJdoc_loc            = '/home/ubuntu/.vim/bundle/javaDoc.vim/srchJdoc.sh' " MUST BE executable
+let g:javadoc_textbrowser_cmd = '/home/ubuntu/env/links/bin/links'
+
+" color scheme configurations
+" lucius color scheme
+set t_Co=256
+let g:lucius_style='dark'           " 'light', 'dark'
+"let g:lucius_style='light'           " 'light', 'dark'
+let g:lucius_contrast='low'		    " 'low', 'normal', 'high'
+let g:lucius_contrast_bg='low'		" 'low', 'normal', 'high'
+let g:lucius_use_bold=1             " 1, 0
+let g:lucius_use_underline=1        " 1, 0
+colorscheme lucius
+hi Normal ctermbg=none
+hi Comment ctermfg=39
+"hi Comment ctermfg=39 ctermbg=256
+hi LineNr ctermfg=247 guifg=#9e9e9e ctermbg=233 guibg=#121212
+
+"cursor crosshair
+hi CursorLine cterm=NONE
+augroup CursorLine
+  au!
+  au VimEnter,WinEnter,BufWinEnter * setlocal cursorline
+  au WinLeave * setlocal nocursorline
+augroup END
+set cursorline
+
+highlight OverLength ctermbg=green ctermfg=black guibg=#FFFF77
+map ,h :match OverLength /\%101v.*/<CR>
+
+set re=1
